@@ -293,7 +293,7 @@ if not df_partidos.empty and not df_pronos_part.empty and not df_premios.empty a
                     fase_pivot = df_fases[df_fases['categoria'] == fase].pivot(
                         index='nombre_jugador', columns='id_premio', values='prediccion_jugador'
                     )
-                    fase_pivot.columns = [f"{fase} - Cupo {i+1}" for i in range(fase_pivot.shape[1])]
+                    fase_pivot.columns = [f"Cupo {i+1}" for i in range(fase_pivot.shape[1])]
                     
                     df_fases_fase = df_fases[df_fases['categoria'] == fase]
                     df_fases_fase['puntos_premios'] = df_fases_fase['prediccion_jugador'].apply(lambda x: 1 if x in ganadores_reales else 0)
@@ -302,7 +302,7 @@ if not df_partidos.empty and not df_pronos_part.empty and not df_premios.empty a
                     fase_puntos = df_fases_fase.pivot(
                         index='nombre_jugador', columns='id_premio', values='puntos_premios'
                     )
-                    fase_puntos.columns = [f"{fase} - Cupo {i+1}" for i in range(fase_puntos.shape[1])]
+                    fase_puntos.columns = [f"Cupo {i+1}" for i in range(fase_puntos.shape[1])]
 
                     # Función para pintar celdas basado en acierto/fallo
                     def colorear_fases(val_puntos):
