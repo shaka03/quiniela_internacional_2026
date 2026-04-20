@@ -192,7 +192,7 @@ with st.spinner('Conectando a la base de datos...'):
 # Ejecución visual
 if not df_partidos.empty and not df_pronos_part.empty and not df_premios.empty and not df_pronos_premios.empty and not df_jugadores.empty:
     st.success("¡Conexión exitosa! 🟢")
-    st.write("Jugadores Cargado:", df_jugadores.shape[0], ".")
+    st.write("Número de Jugadores:", df_jugadores.shape[0], ".")
 
     st.divider()
 
