@@ -103,8 +103,8 @@ def calcular_posiciones(df_partidos, df_premios, df_pronos_part, df_pronos_premi
             ganador_real = df_pr[(df_pr['categoria'] == cat)]['ganador_real'].dropna().unique()
             ganador_real = [g.strip().lower() for g in ganador_real if isinstance(g, str) and g.strip() != '']
             puntos = 0
+            aciertos = 0
             if len(prono) > 0 and len(ganador_real) > 0:
-                aciertos = 0
                 if cat in ['16vos', '8vo']:
                     for p in prono:
                         if p in ganador_real:
@@ -248,7 +248,13 @@ if not df_partidos.empty and not df_pronos_part.empty and not df_premios.empty a
                 if not mis_partidos.empty:
                     vista_partidos = mis_partidos[['equipo_local', 'goles_local_real', 'goles_visitante_real', 'equipo_visitante', 'goles_local_pronostico', 'goles_visitante_pronostico', 'puntos_partidos']]
                     vista_partidos.columns = ['Local', 'Goles L (Real)', 'Goles V (Real)', 'Visitante', 'Goles L (Prono)', 'Goles V (Prono)', 'Pts Ganados']
-                    vista_partidos[['Goles L (Real)', 'Goles V (Real)', 'Goles L (Prono)', 'Goles V (Prono)']] = vista_partidos[['Goles L (Real)', 'Goles V (Real)', 'Goles L (Prono)', 'Goles V (Prono)']].astype(int)
+                    vista_partidos[['Goles L (Real)', 'Goles V (Real)', 'Goles L (Prono)', 'Goles V (Prono)']] = vista_partidos[['Goles L (Real)', 'Goles V (Real)', 'Goles L (Prono)', 'Goles V (Prono)']].fillna('').astype(str)
+
+                    # Eliminar los .0 de los goles para una vista más limpia
+                    vista_partidos['Goles L (Real)'] = vista_partidos['Goles L (Real)'].apply(lambda x: x.replace('.0', '') if x.endswith('.0') else x)
+                    vista_partidos['Goles V (Real)'] = vista_partidos['Goles V (Real)'].apply(lambda x: x.replace('.0', '') if x.endswith('.0') else x)
+                    vista_partidos['Goles L (Prono)'] = vista_partidos['Goles L (Prono)'].apply(lambda x: x.replace('.0', '') if x.endswith('.0') else x)
+                    vista_partidos['Goles V (Prono)'] = vista_partidos['Goles V (Prono)'].apply(lambda x: x.replace('.0', '') if x.endswith('.0') else x)
                     
                     # Resaltamos en verde los partidos donde sumó puntos
                     def resaltar_puntos(val):
@@ -284,23 +290,24 @@ if not df_partidos.empty and not df_pronos_part.empty and not df_premios.empty a
             df_fases = pd.merge(df_pronos_premios, df_premios, on='id_premio', how='left')
             df_fases = pd.merge(df_fases, df_jugadores[['id_jugador', 'nombre_jugador']], on='id_jugador', how='left')
             df_fases = df_fases[df_fases['categoria'].isin(cats_fases)]
+            df_fases = df_fases.rename(columns={'nombre_jugador': 'Jugador', 'categoria': 'Categoría', 'prediccion_jugador': 'Predicción'})
 
             # Creamos una vista pivotada: Jugadores en filas, Categorías en columnas
             # Nota: Como hay múltiples cupos por fase, mostramos un resumen por categoría
             for fase in cats_fases:
                 with st.expander(f"Ver detalle: {fase}"):
-                    ganadores_reales = df_fases[df_fases['categoria'] == fase]['ganador_real'].dropna().unique()
-                    fase_pivot = df_fases[df_fases['categoria'] == fase].pivot(
-                        index='nombre_jugador', columns='id_premio', values='prediccion_jugador'
+                    ganadores_reales = df_fases[df_fases['Categoría'] == fase]['ganador_real'].dropna().unique()
+                    fase_pivot = df_fases[df_fases['Categoría'] == fase].pivot(
+                        index='Jugador', columns='id_premio', values='Predicción'
                     )
                     fase_pivot.columns = [f"Cupo {i+1}" for i in range(fase_pivot.shape[1])]
                     
-                    df_fases_fase = df_fases[df_fases['categoria'] == fase]
-                    df_fases_fase['puntos_premios'] = df_fases_fase['prediccion_jugador'].apply(lambda x: 1 if x in ganadores_reales else 0)
+                    df_fases_fase = df_fases[df_fases['Categoría'] == fase]
+                    df_fases_fase['puntos_premios'] = df_fases_fase['Predicción'].apply(lambda x: 1 if x in ganadores_reales else 0)
                     
                     # Obtenemos los puntos para colorear (misma estructura que el pivot)
                     fase_puntos = df_fases_fase.pivot(
-                        index='nombre_jugador', columns='id_premio', values='puntos_premios'
+                        index='Jugador', columns='id_premio', values='puntos_premios'
                     )
                     fase_puntos.columns = [f"Cupo {i+1}" for i in range(fase_puntos.shape[1])]
 
@@ -335,10 +342,12 @@ if not df_partidos.empty and not df_pronos_part.empty and not df_premios.empty a
             df_tops = pd.merge(df_pronos_premios, df_premios, on='id_premio', how='left')
             df_tops = pd.merge(df_tops, df_jugadores[['id_jugador', 'nombre_jugador']], on='id_jugador', how='left')
             df_tops = df_tops[df_tops['categoria'].isin(['Campeón', 'Goleador'])]
-            df_tops['puntos_premios'] = df_tops['prediccion_jugador'] == df_tops['ganador_real']
+            df_tops = df_tops.rename(columns={'nombre_jugador': 'Jugador', 'categoria': 'Categoría', 'prediccion_jugador': 'Predicción'})
+
+            df_tops['puntos_premios'] = df_tops['Predicción'] == df_tops['ganador_real']
             df_tops['puntos_premios'] = df_tops['puntos_premios'].astype(int)
 
-            top_pivot = df_tops.pivot(index='nombre_jugador', columns='categoria', values='prediccion_jugador')
+            top_pivot = df_tops.pivot(index='Jugador', columns='Categoría', values='Predicción')
 
             # Lógica de color simplificada para esta tabla
             def colorear_tops(col):
@@ -347,7 +356,7 @@ if not df_partidos.empty and not df_pronos_part.empty and not df_premios.empty a
                 styles = []
                 for jugador_alias, prono in col.items():
                     id_jug = df_jugadores[df_jugadores['nombre_jugador'] == jugador_alias]['id_jugador'].values[0]
-                    pts = df_tops[(df_tops['id_jugador'] == id_jug) & (df_tops['categoria'] == cat_name)]['puntos_premios'].values[0]
+                    pts = df_tops[(df_tops['id_jugador'] == id_jug) & (df_tops['Categoría'] == cat_name)]['puntos_premios'].values[0]
                     styles.append(colorear_fases(pts))
                 return styles
 
