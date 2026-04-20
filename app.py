@@ -363,4 +363,4 @@ if not df_partidos.empty and not df_pronos_part.empty and not df_premios.empty a
             st.table(top_pivot.style.apply(colorear_tops))
 
 else:
-    st.error("⚠️ Esperando URLs válidas. Por favor actualiza el diccionario 'URLS' en el código.")
+    st.error("⚠️ Esperando URLs válidas. Por favor actualiza las 'URLS'.")
