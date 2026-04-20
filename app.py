@@ -326,7 +326,7 @@ if not df_partidos.empty and not df_pronos_part.empty and not df_premios.empty a
                                 except: pass
                         return color_df
 
-                    st.dataframe(fase_pivot.style.apply(aplicar_color_fase, axis=None))
+                    st.table(fase_pivot.style.apply(aplicar_color_fase, axis=None))
 
         # --- TAB 4: CAMPEÓN Y GOLEADOR (NUEVA) ---
         with tab4:
