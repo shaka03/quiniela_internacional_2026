@@ -285,8 +285,10 @@ if not df_partidos.empty and not df_pronos_part.empty and not df_premios.empty a
                     def resaltar_puntos(val):
                         if val == 3:
                             color = '#c3e6cb' # Verde acierto pleno
+                            return f'background-color: {color}; color: #155724;' # Texto verde oscuro para contraste
                         elif val == 1:
                             color = '#d4edda' # Verde claro si ganó puntos
+                            return f'background-color: {color}; color: #155724;' # Texto verde oscuro para contraste
                         else:
                             color = '' # Sin color si no ganó puntos
                         return f'background-color: {color}'
