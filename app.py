@@ -58,8 +58,11 @@ def calcular_posiciones(df_partidos, df_premios, df_pronos_part, df_pronos_premi
 
         # Reglas de Puntuación
         def asignar_puntos_partido(row):
+            # No se cargaron valores en pronóstico (0 puntos)
+            if pd.isna(row['goles_local_pronostico']) or pd.isna(row['goles_visitante_pronostico']):
+                return 0
             # Acierto Pleno (3 puntos)
-            if (row['goles_local_real'] == row['goles_local_pronostico']) and (row['goles_visitante_real'] == row['goles_visitante_pronostico']):
+            elif (row['goles_local_real'] == row['goles_local_pronostico']) and (row['goles_visitante_real'] == row['goles_visitante_pronostico']):
                 return 3
             # Acierto de Tendencia (1 punto)
             elif row['tendencia_real'] == row['tendencia_prono']:
@@ -97,11 +100,30 @@ def calcular_posiciones(df_partidos, df_premios, df_pronos_part, df_pronos_premi
     categorias = df_pr['categoria'].unique()
     jugadores = df_pr['id_jugador'].unique()
     for jug in jugadores:
-        for cat in categorias:
-            prono = df_pr[(df_pr['categoria'] == cat) & (df_pr['id_jugador'] == jug)]['prediccion_jugador'].values
-            prono = [p.strip().lower() for p in prono if isinstance(p, str) and p.strip() != '']
-            ganador_real = df_pr[(df_pr['categoria'] == cat)]['ganador_real'].dropna().unique()
-            ganador_real = [g.strip().lower() for g in ganador_real if isinstance(g, str) and g.strip() != '']
+        for cat in categorias:            
+            # Limpiamos los pronósticos para evitar problemas de formato (espacios, mayúsculas, etc.)
+            prono = df_pr[(df_pr['categoria'] == cat) & (df_pr['id_jugador'] == jug)]['prediccion_jugador'].unique()
+            prono_list = []
+            counter = 1
+            for p in prono:
+                if isinstance(p, str) and p.strip() != '':
+                    prono_list.append(p.strip().lower())
+                    counter += 1
+                else:
+                    prono_list.append(f"clasificado_{counter}_jug{jug}") # Si el pronóstico está vacío, asumimos que es un clasificado pendiente
+            prono = set(prono_list)
+
+            # Limpiamos los ganadores reales de la misma forma
+            ganador_real = df_pr[(df_pr['categoria'] == cat)]['ganador_real'].unique()
+            ganador_real_list = []
+            counter_real = 1
+            for g in ganador_real:
+                if isinstance(g, str) and g.strip() != '':
+                    ganador_real_list.append(g.strip().lower())
+                    counter_real += 1
+                else:
+                    ganador_real_list.append(f"clasificado_{counter_real}") # Si el ganador real está vacío, asumimos que es un clasificado pendiente
+            ganador_real = set(ganador_real_list)
             puntos = 0
             aciertos = 0
             if len(prono) > 0 and len(ganador_real) > 0:
@@ -111,7 +133,10 @@ def calcular_posiciones(df_partidos, df_premios, df_pronos_part, df_pronos_premi
                             puntos += puntos_por_categoria.get(cat, 0)
                             aciertos += 1
                 if cat in ['4tos', 'Semis', 'Final', 'Tercer Lugar', 'Campeón', 'Goleador']:
-                    if set(prono) == set(ganador_real):
+                    print(f"Evaluando {cat} para jugador {jug}:")
+                    print(prono, ganador_real)
+                    print(prono == ganador_real)
+                    if prono == ganador_real:
                         puntos = puntos_por_categoria.get(cat, 0)
                         aciertos = "Acierto total"
             list_df_pr.append({'id_jugador': jug, 'categoria': cat, 'aciertos': aciertos, 'puntos_premios': puntos})
