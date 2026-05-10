@@ -237,8 +237,9 @@ if not df_partidos.empty and not df_pronos_part.empty and not df_premios.empty a
         with tab1:
             st.header("Tabla de Posiciones General")
             # Aplicamos la pintura mágica que hicimos antes
+            tabla_posiciones = tabla_posiciones.sort_values(by=["Puntos Totales", "Jugador"], ascending=[False, True]) # Ordenamos por puntos y luego alfabéticamente
             tabla_estilizada = tabla_posiciones.style.apply(aplicar_estilos_quiniela, axis=None)
-            tabla_estilizada = tabla_estilizada.sort_values(by=["Puntos Totales", "Jugador"], ascending=[False, True]) # Ordenamos por puntos y luego alfabéticamente
+
             # Mostramos la tabla completa sin scroll interno
             st.table(tabla_estilizada)
 
