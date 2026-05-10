@@ -217,7 +217,7 @@ with st.spinner('Conectando a la base de datos...'):
 # Ejecución visual
 if not df_partidos.empty and not df_pronos_part.empty and not df_premios.empty and not df_pronos_premios.empty and not df_jugadores.empty:
     st.success("¡Conexión exitosa! 🟢")
-    st.write("Número de Jugadores:", df_jugadores.shape[0], ".")
+    #st.write("Número de Jugadores:", df_jugadores.shape[0], ".")
 
     st.divider()
 
@@ -225,11 +225,12 @@ if not df_partidos.empty and not df_pronos_part.empty and not df_premios.empty a
         tabla_posiciones, detalle_partidos, detalle_premios = calcular_posiciones(df_partidos, df_premios, df_pronos_part, df_pronos_premios, df_jugadores)
 
         # 1. Creamos las 4 pestañas solicitadas
-        tab1, tab2, tab3, tab4 = st.tabs([
+        tab1, tab2, tab3, tab4, tab5 = st.tabs([
             "🏆 Clasificación", 
             "🕵️‍♂️ Mi Auditoría", 
             "📊 Fases Eliminatorias", 
-            "🥇 Campeón y Goleador"
+            "🥇 Campeón y Goleador",
+            "📜 Reglas",
         ])
 
         # --- TAB 1: CLASIFICACIÓN ---
@@ -388,6 +389,13 @@ if not df_partidos.empty and not df_pronos_part.empty and not df_premios.empty a
                 return styles
 
             st.table(top_pivot.style.apply(colorear_tops))
+        
+        # --- TAB 5: REGLAS DE LA QUINIELA ---
+        with tab5:            
+            try:
+                st.image("Reglas_Quiniela.jpeg", use_container_width=True)
+            except Exception as e:
+                st.error("No se pudo cargar la imagen de las reglas. Verifica que el archivo exista en el repositorio.")
 
 else:
     st.error("⚠️ Esperando URLs válidas. Por favor actualiza las 'URLS'.")
