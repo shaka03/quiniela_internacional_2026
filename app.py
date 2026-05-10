@@ -238,8 +238,9 @@ if not df_partidos.empty and not df_pronos_part.empty and not df_premios.empty a
             st.header("Tabla de Posiciones General")
             # Aplicamos la pintura mágica que hicimos antes
             tabla_posiciones = tabla_posiciones.sort_values(by=["Puntos Totales", "Jugador"], ascending=[False, True]) # Ordenamos por puntos y luego alfabéticamente
-            tabla_posiciones['Posición'] = range(1, len(tabla_posiciones) + 1) # Reindexamos para mostrar el ranking empezando en 1
-            tabla_posiciones = tabla_posiciones[['Posición', 'Jugador', 'Puntos Totales', 'Pts Partidos', 'Pts Fases']] # Reordenamos columnas para mostrar la posición al inicio
+            tabla_posiciones.index = range(1, len(tabla_posiciones) + 1) # Reindexamos para mostrar el ranking empezando en 1
+            tabla_posiciones = tabla_posiciones.reset_index()
+            tabla_posiciones = tabla_posiciones.rename(columns={'index': 'Posición'})
             tabla_estilizada = tabla_posiciones.style.apply(aplicar_estilos_quiniela, axis=None)
 
             # Mostramos la tabla completa sin scroll interno
