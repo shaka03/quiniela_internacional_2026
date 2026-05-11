@@ -133,9 +133,6 @@ def calcular_posiciones(df_partidos, df_premios, df_pronos_part, df_pronos_premi
                             puntos += puntos_por_categoria.get(cat, 0)
                             aciertos += 1
                 if cat in ['4tos', 'Semis', 'Final', 'Tercer Lugar', 'Campeón', 'Goleador']:
-                    print(f"Evaluando {cat} para jugador {jug}:")
-                    print(prono, ganador_real)
-                    print(prono == ganador_real)
                     if prono == ganador_real:
                         puntos = puntos_por_categoria.get(cat, 0)
                         aciertos = "Acierto total"
@@ -210,16 +207,14 @@ def aplicar_estilos_quiniela(df):
 with st.spinner('Conectando a la base de datos...'):
     df_premios = cargar_datos(URLS["premios_reales"])
     df_partidos = cargar_datos(URLS["partidos_reales"])
-    df_pronos_part = cargar_datos(URLS["pronosticos_partidos"]).drop(columns=['equipo_local', 'equipo_visitante']) # Eliminamos la columna de timestamp si existe
-    df_pronos_premios = cargar_datos(URLS["pronosticos_premios"]).drop(columns=['categoria']) # Eliminamos la columna de timestamp si existe
+    df_pronos_part = cargar_datos(URLS["pronosticos_partidos"]).drop(columns=['equipo_local', 'equipo_visitante', 'nombre_jugador'])
+    df_pronos_premios = cargar_datos(URLS["pronosticos_premios"]).drop(columns=['categoria', 'nombre_jugador'])
     df_jugadores = cargar_datos(URLS["mapeo_jugadores"])
 
 # Ejecución visual
 if not df_partidos.empty and not df_pronos_part.empty and not df_premios.empty and not df_pronos_premios.empty and not df_jugadores.empty:
-    st.success("¡Conexión exitosa! 🟢")
+    #st.success("¡Conexión exitosa! 🟢")
     #st.write("Número de Jugadores:", df_jugadores.shape[0], ".")
-
-    st.divider()
 
     if not df_partidos.empty and not df_pronos_part.empty:
         tabla_posiciones, detalle_partidos, detalle_premios = calcular_posiciones(df_partidos, df_premios, df_pronos_part, df_pronos_premios, df_jugadores)
