@@ -225,7 +225,7 @@ if not df_partidos.empty and not df_pronos_part.empty and not df_premios.empty a
             "🕵️‍♂️ Mi Auditoría", 
             "📊 Fases Eliminatorias", 
             "🥇 Campeón y Goleador",
-            "📜 Reglas",
+            "📜 Reglas y recomendaciones",
         ])
 
         # --- TAB 1: CLASIFICACIÓN ---
@@ -394,6 +394,8 @@ if not df_partidos.empty and not df_pronos_part.empty and not df_premios.empty a
         with tab5:            
             try:
                 st.image("Reglas_Quiniela.jpeg", use_container_width=True)
+                st.divider()
+                st.image("Recomendaciones_Quiniela.jpeg", use_container_width=True)
             except Exception as e:
                 st.error("No se pudo cargar la imagen de las reglas. Verifica que el archivo exista en el repositorio.")
 
