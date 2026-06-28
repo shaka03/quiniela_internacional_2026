@@ -114,20 +114,21 @@ def calcular_posiciones(df_partidos, df_premios, df_pronos_part, df_pronos_premi
             prono = set(prono_list)
 
             # Limpiamos los ganadores reales de la misma forma
-            ganador_real = df_pr[(df_pr['categoria'] == cat)]['ganador_real'].unique()
+            ganador_real = df_premios[(df_premios['categoria'] == cat)]['ganador_real'].values
             ganador_real_list = []
             counter_real = 1
             for g in ganador_real:
                 if isinstance(g, str) and g.strip() != '':
                     ganador_real_list.append(g.strip().lower())
-                    counter_real += 1
                 else:
                     ganador_real_list.append(f"clasificado_{counter_real}") # Si el ganador real está vacío, asumimos que es un clasificado pendiente
+                counter_real += 1
             ganador_real = set(ganador_real_list)
             puntos = 0
             aciertos = 0
+
             if len(prono) > 0 and len(ganador_real) > 0:
-                if cat in ['16vos', '8vo']:
+                if cat in ['16vos', '8vos']:
                     for p in prono:
                         if p in ganador_real:
                             puntos += puntos_por_categoria.get(cat, 0)
