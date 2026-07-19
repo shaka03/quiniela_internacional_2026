@@ -133,7 +133,7 @@ def calcular_posiciones(df_partidos, df_premios, df_pronos_part, df_pronos_premi
                         if p in ganador_real:
                             puntos += puntos_por_categoria.get(cat, 0)
                             aciertos += 1
-                if cat in ['4tos', 'Semis', 'Final', 'Tercer Lugar', 'Campeón', 'Goleador']:
+                if cat in ['4tos', 'Semis', 'Final', 'Tercer lugar', 'Campeón', 'Goleador']:
                     if prono == ganador_real:
                         puntos = puntos_por_categoria.get(cat, 0)
                         aciertos = "Acierto total"
